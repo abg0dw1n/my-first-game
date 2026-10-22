@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panthers Football Trivia</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #101820;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .game-card {
+      background-color: #1e293b;
+      border: 3px solid #0085CA;
+      border-radius: 8px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 15px rgba(0, 133, 202, 0.3);
+      text-align: center;
+    }
+    h1 {
+      color: #0085CA;
+      margin-top: 0;
+    }
+    .score-board {
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      background-color: #000000;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+    .question-text {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .btn-option {
+      background-color: #0085CA;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .btn-option:hover {
+      background-color: #006093;
+    }
+    .result-msg {
+      margin-top: 1rem;
+      font-weight: bold;
+      font-size: 1.1rem;
+      min-height: 1.5rem;
+    }
+    .restart-btn {
+      background-color: #ffffff;
+      color: #101820;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1.5rem;
+      display: none;
+    }
+    .restart-btn:hover {
+      background-color: #dddddd;
+    }
+  </style>
+</head>
+<body>
 
+  <div class="game-card">
+    <h1>Panthers Trivia Challenge</h1>
+    <div class="score-board">
+      Score: <span id="score">0</span> / <span id="total-questions">0</span>
+    </div>
+
+    <div id="quiz-box">
+      <div class="question-text" id="question">Loading question...</div>
+      <div class="options-grid" id="options"></div>
+      <div class="result-msg" id="feedback"></div>
+    </div>
+
+    <button class="restart-btn" id="restart-btn" onclick="startQuiz()">Play Again</button>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "In what year were the Carolina Panthers established?",
+        options: ["1993", "1995", "1998", "2001"],
+        answer: 1
+      },
+      {
+        question: "What is the official team chant / rally cry?",
+        options: ["Fly Eagles Fly", "Keep Pounding", "Who Dat", "Rise Up"],
+        answer: 1
+      },
+      {
+        question: "Which stadium do the Panthers play in?",
+        options: ["Bank of America Stadium", "MetLife Stadium", "Ford Field", "Nissan Stadium"],
+        answer: 0
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      document.getElementById("score").textContent = score;
+      document.getElementById("total-questions").textContent = quizData.length;
+      document.getElementById("restart-btn").style.display = "none";
+      document.getElementById("quiz-box").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = quizData[currentQuestionIndex];
+      document.getElementById("question").textContent = `Q${currentQuestionIndex + 1}: ${q.question}`;
+      document.getElementById("feedback").textContent = "";
+
+      const optionsContainer = document.getElementById("options");
+      optionsContainer.innerHTML = "";
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-option";
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(idx);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIdx) {
+      const correctIdx = quizData[currentQuestionIndex].answer;
+      const feedbackEl = document.getElementById("feedback");
+
+      if (selectedIdx === correctIdx) {
+        score++;
+        document.getElementById("score").textContent = score;
+        feedbackEl.style.color = "#4ade80";
+        feedbackEl.textContent = "Correct! Keep Pounding!";
+      } else {
+        feedbackEl.style.color = "#f87171";
+        feedbackEl.textContent = `Incorrect! The answer was ${quizData[currentQuestionIndex].options[correctIdx]}.`;
+      }
+
+      // Disable buttons briefly to prevent double clicks
+      const buttons = document.querySelectorAll(".btn-option");
+      buttons.forEach(btn => btn.disabled = true);
+
+      setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+          showQuestion();
+        } else {
+          endQuiz();
+        }
+      }, 1500);
+    }
+
+    function endQuiz() {
+      document.getElementById("question").textContent = "Quiz Finished!";
+      document.getElementById("options").innerHTML = "";
+      document.getElementById("feedback").style.color = "#ffffff";
+      document.getElementById("feedback").textContent = `Final Score: ${score} out of ${quizData.length}!`;
+      document.getElementById("restart-btn").style.display = "inline-block";
+    }
+
+    // Initialize game on page load
+    startQuiz();
+  </script>
+
+</body>
+</html>
