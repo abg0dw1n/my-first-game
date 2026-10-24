@@ -3,265 +3,629 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panthers Football Trivia</title>
+  <title>Panthers Trivia | Keep Pounding</title>
+  <meta name="description" content="Carolina Panthers trivia: Classic, Blitz, Sudden Death and a Daily Challenge. Unofficial fan-made game.">
+  <meta name="theme-color" content="#0085CA">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%230B0E14'/><circle cx='50' cy='50' r='44' fill='none' stroke='%230085CA' stroke-width='6'/><text x='50%' y='62%' text-anchor='middle' fill='%230085CA' font-family='sans-serif' font-weight='900' font-size='44'>?</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --blue: #0085CA; --blue-dk: #006093; --silver: #A5ACAF; --bg: #07090e; --card: rgba(22, 33, 50, 0.78);
+      --edge: rgba(0, 133, 202, 0.28); --good: #22c55e; --bad: #ef4444; --gold: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #101820;
-      color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      font-family: 'Montserrat', system-ui, sans-serif; color: #fff;
+      background: radial-gradient(900px 500px at 90% -10%, rgba(0,133,202,.25), transparent 60%),
+                  radial-gradient(700px 400px at -10% 40%, rgba(0,133,202,.10), transparent 60%), var(--bg);
+      display: flex; justify-content: center; padding: 16px;
     }
-    .game-card {
-      background-color: #1e293b;
-      border: 3px solid #0085CA;
-      border-radius: 12px;
-      padding: 2rem;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 8px 25px rgba(0, 133, 202, 0.4);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+    .wrap { width: 100%; max-width: 680px; }
+    .card {
+      background: linear-gradient(160deg, rgba(26,39,58,.85), rgba(10,14,22,.9)); border: 1px solid var(--edge);
+      border-radius: 18px; padding: 22px; box-shadow: 0 20px 50px -20px rgba(0,0,0,.8), 0 0 40px -18px rgba(0,133,202,.6);
+      position: relative; overflow: hidden;
     }
-    h1 {
-      color: #0085CA;
-      margin-top: 0;
-      letter-spacing: 1px;
+    h1, h2, .display { font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400; letter-spacing: .05em; margin: 0; line-height: 1; }
+    h1 { font-size: clamp(2.4rem, 7vw, 3.4rem); }
+    .hype { background: linear-gradient(92deg, #fff, #bfe7ff 45%, #36b3f2); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .muted { color: var(--silver); }
+    .small { font-size: 12px; }
+    .tiny { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
+    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .between { justify-content: space-between; }
+    .hidden { display: none !important; }
+    button { font: inherit; cursor: pointer; }
+    button:disabled { cursor: default; }
+    .btn {
+      background: var(--blue); color: #fff; border: 0; border-radius: 10px; padding: 11px 18px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: .08em;
+      box-shadow: 0 8px 22px -8px rgba(0,133,202,.8), inset 0 1px 0 rgba(255,255,255,.2); transition: transform .12s, background .12s;
     }
-    .score-board {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-      background-color: #000000;
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #0085CA;
+    .btn:hover:not(:disabled) { background: var(--blue-dk); transform: translateY(-1px); }
+    .btn.ghost { background: transparent; border: 1px solid var(--edge); box-shadow: none; color: var(--silver); }
+    .btn.ghost:hover:not(:disabled) { color: #fff; border-color: var(--blue); background: rgba(0,133,202,.1); }
+    .btn:focus-visible, .mode:focus-visible, .opt:focus-visible, .chip:focus-visible { outline: 3px solid #7fd3ff; outline-offset: 2px; }
+
+    /* Start screen */
+    .modes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px; }
+    @media (max-width: 480px) { .modes { grid-template-columns: 1fr; } }
+    .mode {
+      text-align: left; background: rgba(0,0,0,.35); border: 1px solid var(--edge); border-radius: 14px; padding: 14px; color: #fff;
+      transition: border-color .15s, transform .15s, box-shadow .15s;
     }
-    .timer-container {
-      width: 100%;
-      background-color: #000000;
-      height: 10px;
-      border-radius: 5px;
-      margin-bottom: 1.5rem;
-      overflow: hidden;
+    .mode:hover { border-color: var(--blue); transform: translateY(-2px); box-shadow: 0 10px 30px -14px rgba(0,133,202,.8); }
+    .mode .icon { font-size: 26px; }
+    .mode .name { font-family: 'Bebas Neue', sans-serif; font-size: 1.55rem; letter-spacing: .06em; margin-top: 4px; }
+    .mode .desc { font-size: 11px; color: var(--silver); margin-top: 2px; }
+    .mode .best { font-size: 10px; color: var(--gold); margin-top: 6px; font-weight: 700; letter-spacing: .06em; }
+    .mode.done { opacity: .75; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { background: rgba(0,0,0,.4); border: 1px solid var(--edge); color: var(--silver); border-radius: 999px; padding: 6px 11px; font-size: 11px; font-weight: 700; }
+    .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .label { margin: 16px 0 6px; }
+
+    /* Game screen */
+    .hud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat { background: rgba(0,0,0,.4); border: 1px solid var(--edge); border-radius: 12px; padding: 8px; text-align: center; }
+    .stat b { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; letter-spacing: .05em; line-height: 1; }
+    .bar { height: 8px; background: rgba(0,0,0,.5); border-radius: 99px; overflow: hidden; margin: 12px 0 14px; }
+    .bar > div { height: 100%; width: 100%; background: linear-gradient(90deg, var(--blue), #36b3f2); transition: width .25s linear; }
+    .bar.low > div { background: linear-gradient(90deg, #f59e0b, var(--bad)); }
+    .qmeta { margin-bottom: 8px; }
+    .tag { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--edge); color: #7fd3ff; }
+    .tag.lvl-rookie { color: #86efac; border-color: rgba(34,197,94,.4); }
+    .tag.lvl-pro { color: #7fd3ff; }
+    .tag.lvl-legend { color: var(--gold); border-color: rgba(251,191,36,.45); }
+    .question { font-size: clamp(1.1rem, 3.6vw, 1.35rem); font-weight: 800; line-height: 1.35; min-height: 3.2em; }
+    .opts { display: grid; gap: 9px; margin-top: 14px; }
+    .opt {
+      display: flex; align-items: center; gap: 10px; text-align: left; width: 100%; background: rgba(0,133,202,.14);
+      border: 1px solid rgba(0,133,202,.45); color: #fff; border-radius: 12px; padding: 13px 14px; font-weight: 700; font-size: .98rem;
+      transition: background .12s, transform .1s, border-color .12s, opacity .2s;
     }
-    .timer-bar {
-      height: 100%;
-      width: 100%;
-      background-color: #0085CA;
-      transition: width 1s linear;
-    }
-    .question-text {
-      font-size: 1.25rem;
-      margin-bottom: 1.5rem;
-      font-weight: bold;
-    }
-    .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .btn-option {
-      background-color: #0085CA;
-      color: white;
-      border: none;
-      padding: 0.85rem;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .btn-option:hover {
-      background-color: #006093;
-      transform: translateY(-2px);
-    }
-    .result-msg {
-      margin-top: 1.2rem;
-      font-weight: bold;
-      font-size: 1.1rem;
-      min-height: 1.5rem;
-    }
-    .restart-btn {
-      background-color: #0085CA;
-      color: #ffffff;
-      border: 2px solid #ffffff;
-      padding: 0.75rem 1.75rem;
-      font-size: 1.1rem;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 1.5rem;
-      display: none;
-    }
-    .restart-btn:hover {
-      background-color: #006093;
-    }
+    .opt:hover:not(:disabled) { background: rgba(0,133,202,.32); transform: translateY(-1px); }
+    .opt .key { flex: none; width: 24px; height: 24px; border-radius: 7px; background: rgba(0,0,0,.45); display: grid; place-items: center; font-size: 12px; color: var(--silver); }
+    .opt.right { background: rgba(34,197,94,.25); border-color: var(--good); }
+    .opt.wrong { background: rgba(239,68,68,.25); border-color: var(--bad); animation: shake .35s; }
+    .opt.gone { opacity: .15; }
+    .opt:disabled:not(.right):not(.wrong) { opacity: .55; }
+    @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    .feedback { margin-top: 12px; padding: 12px; border-radius: 12px; background: rgba(0,0,0,.4); border-left: 4px solid var(--blue); font-size: 13px; line-height: 1.45; }
+    .feedback.good { border-left-color: var(--good); }
+    .feedback.bad { border-left-color: var(--bad); }
+    .feedback strong { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: .05em; font-weight: 400; }
+    .lifelines .btn { font-size: 1rem; padding: 8px 12px; }
+    .streak { color: var(--gold); }
+    .pop { animation: pop .35s ease-out; }
+    @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+    /* Results */
+    .big { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.4rem, 14vw, 5.5rem); line-height: .9; }
+    .rank { display: inline-block; margin-top: 6px; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(251,191,36,.5); color: var(--gold); font-weight: 800; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 16px 0; }
+    .emoji { font-size: 22px; letter-spacing: 2px; word-break: break-all; }
+    .review { margin-top: 14px; display: grid; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+    .review .item { background: rgba(0,0,0,.35); border: 1px solid var(--edge); border-radius: 10px; padding: 10px; font-size: 12px; }
+    .review .ans { color: #86efac; font-weight: 700; }
+    .review .mine { color: #fca5a5; }
+    .newbest { color: var(--gold); font-weight: 800; letter-spacing: .1em; font-size: 12px; text-transform: uppercase; }
+    footer { text-align: center; margin-top: 14px; font-size: 10px; color: #5b6b80; }
+    .confetti { position: fixed; top: -10px; width: 8px; height: 14px; border-radius: 2px; animation: fall linear forwards; pointer-events: none; z-index: 50; }
+    @keyframes fall { to { transform: translateY(105vh) rotate(720deg); opacity: .9; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
+<div class="wrap">
 
-  <div class="game-card">
-    <h1>Panthers Trivia Challenge</h1>
-    <div class="score-board">
-      Score: <span id="score">0</span> / <span id="total-questions">0</span>
+  <!-- START -->
+  <section id="screen-start" class="card">
+    <div class="row between">
+      <span class="tiny muted">🐾 Panthers Fan Central</span>
+      <span class="tiny muted" id="bank-size"></span>
     </div>
+    <h1 class="hype" style="margin-top:6px">Panthers Trivia</h1>
+    <p class="muted small" style="margin:6px 0 0">Think you know Carolina football? Pick a mode and prove it.</p>
 
-    <div class="timer-container">
-      <div class="timer-bar" id="timer-bar"></div>
+    <div class="modes" id="modes"></div>
+
+    <div id="options-area">
+      <div class="tiny muted label">Category</div>
+      <div class="chips" id="cat-chips"></div>
+      <div class="tiny muted label">Difficulty <span style="text-transform:none;letter-spacing:0;font-weight:600">(Classic only)</span></div>
+      <div class="chips" id="lvl-chips"></div>
     </div>
+    <p class="muted small" style="margin:16px 0 0">⌨️ Use keys 1–4 to answer. Faster answers and streaks score more.</p>
+  </section>
 
-    <div id="quiz-box">
-      <div class="question-text" id="question">Loading question...</div>
-      <div class="options-grid" id="options"></div>
-      <div class="result-msg" id="feedback"></div>
+  <!-- GAME -->
+  <section id="screen-game" class="card hidden" aria-live="polite">
+    <div class="row between" style="margin-bottom:10px">
+      <span class="tiny muted" id="mode-label"></span>
+      <button class="btn ghost" style="font-size:.9rem;padding:5px 10px" onclick="quitGame()">✕ Quit</button>
     </div>
+    <div class="hud">
+      <div class="stat"><span class="tiny muted" id="hud-left-label">Question</span><b id="hud-left">1/10</b></div>
+      <div class="stat"><span class="tiny muted">Score</span><b id="hud-score">0</b></div>
+      <div class="stat"><span class="tiny muted">Streak</span><b id="hud-streak" class="streak">0</b></div>
+    </div>
+    <div class="bar" id="bar"><div id="bar-fill"></div></div>
 
-    <button class="restart-btn" id="restart-btn" onclick="startQuiz()">Play Again</button>
-  </div>
+    <div class="row between qmeta">
+      <div class="row"><span class="tag" id="q-cat"></span><span class="tag" id="q-lvl"></span></div>
+      <div class="row lifelines" id="lifelines">
+        <button class="btn ghost" id="ll-5050" onclick="useFifty()" title="Remove two wrong answers (once per game)">50/50</button>
+        <button class="btn ghost" id="ll-skip" onclick="useSkip()" title="Skip this question without breaking your streak (once per game)">⏭ Skip</button>
+      </div>
+    </div>
+    <div class="question" id="question"></div>
+    <div class="opts" id="opts"></div>
+    <div class="feedback hidden" id="feedback"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button class="btn hidden" id="next-btn" onclick="nextQuestion()">Next ▶</button>
+    </div>
+  </section>
 
-  <script>
-    const quizData = [
-      {
-        question: "In what year were the Carolina Panthers established?",
-        options: ["1993", "1995", "1998", "2001"],
-        answer: 1
-      },
-      {
-        question: "What is the official team chant / rally cry?",
-        options: ["Fly Eagles Fly", "Keep Pounding", "Who Dat", "Rise Up"],
-        answer: 1
-      },
-      {
-        question: "Which stadium do the Panthers play in?",
-        options: ["Bank of America Stadium", "MetLife Stadium", "Ford Field", "Nissan Stadium"],
-        answer: 0
-      },
-      {
-        question: "Who was the legendary linebacker who inspired the phrase 'Keep Pounding'?",
-        options: ["Luke Kuechly", "Thomas Davis", "Sam Mills", "Julius Peppers"],
-        answer: 2
-      },
-      {
-        question: "What are the official team colors of the Panthers?",
-        options: ["Blue, Gold & White", "Process Blue, Black & Silver", "Navy Blue & Gold", "Teal, Black & White"],
-        answer: 1
-      }
-    ];
+  <!-- RESULTS -->
+  <section id="screen-results" class="card hidden">
+    <span class="tiny muted" id="res-mode"></span>
+    <div class="row between" style="align-items:flex-end;margin-top:6px">
+      <div>
+        <div class="big hype" id="res-score">0</div>
+        <span class="tiny muted">points</span>
+      </div>
+      <div style="text-align:right">
+        <div class="rank" id="res-rank"></div>
+        <div class="newbest hidden" id="res-best" style="margin-top:8px">★ New personal best</div>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="stat"><span class="tiny muted">Correct</span><b id="res-correct">0</b></div>
+      <div class="stat"><span class="tiny muted">Accuracy</span><b id="res-acc">0%</b></div>
+      <div class="stat"><span class="tiny muted">Best streak</span><b id="res-streak">0</b></div>
+    </div>
+    <div class="emoji" id="res-grid"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="playAgain()">↻ Play again</button>
+      <button class="btn ghost" onclick="showStart()">Change mode</button>
+      <button class="btn ghost" onclick="shareResult()" id="share-btn">📋 Share</button>
+    </div>
+    <div id="review-wrap" class="hidden">
+      <div class="tiny muted label">Review what you missed</div>
+      <div class="review" id="review"></div>
+    </div>
+  </section>
 
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let timer;
-    let timeLeft = 10;
-    const TIME_LIMIT = 10;
+  <footer>Unofficial fan-made game. Not affiliated with the Carolina Panthers or the NFL. Facts checked Oct 2026.</footer>
+</div>
 
-    function startQuiz() {
-      currentQuestionIndex = 0;
-      score = 0;
-      document.getElementById("score").textContent = score;
-      document.getElementById("total-questions").textContent = quizData.length;
-      document.getElementById("restart-btn").style.display = "none";
-      document.getElementById("quiz-box").style.display = "block";
-      showQuestion();
-    }
+<script>
+// ===================================================================================================
+// QUESTION BANK. a[0] is the correct answer (answers are shuffled on screen).
+// cat: history | legends | squad | stadium      lvl: rookie | pro | legend
+// Facts were checked against panthers.com, Pro-Football-Reference and Wikipedia (Oct 2026).
+// ===================================================================================================
+const QUESTIONS = [
+  // ---- History
+  { cat: 'history', lvl: 'rookie', q: 'In what year was Carolina awarded its NFL franchise?', a: ['1993', '1995', '1989', '1997'], fact: 'NFL owners voted unanimously on Oct 26, 1993, making Carolina the league’s 29th franchise. The first season was 1995.' },
+  { cat: 'history', lvl: 'rookie', q: 'What was the Panthers’ first season of play?', a: ['1995', '1993', '1996', '1999'], fact: 'Carolina went 7-9 in 1995, the best record ever for a first-year expansion team.' },
+  { cat: 'history', lvl: 'pro', q: 'Where did the Panthers play their home games in 1995?', a: ['Clemson’s Memorial Stadium', 'Kenan Stadium (Chapel Hill)', 'Carter-Finley Stadium (Raleigh)', 'Ericsson Stadium'], fact: 'The stadium in Charlotte wasn’t ready yet, so the inaugural season was played at Clemson.' },
+  { cat: 'history', lvl: 'pro', q: 'Who did the Panthers beat in the first game in franchise history (1995 Hall of Fame Game)?', a: ['Jacksonville Jaguars', 'Atlanta Falcons', 'Dallas Cowboys', 'New York Jets'], fact: 'Carolina beat fellow expansion team Jacksonville 20-14 in Canton on July 29, 1995.' },
+  { cat: 'history', lvl: 'legend', q: 'Who did Carolina beat for its first regular-season win, in October 1995?', a: ['New York Jets', 'San Francisco 49ers', 'New Orleans Saints', 'St. Louis Rams'], fact: 'The Panthers beat the Jets 26-15 on Oct 15, 1995.' },
+  { cat: 'history', lvl: 'legend', q: 'In 1995, the first-year Panthers beat which defending Super Bowl champion on the road?', a: ['San Francisco 49ers', 'Dallas Cowboys', 'Green Bay Packers', 'Pittsburgh Steelers'], fact: 'Carolina won 13-7 at San Francisco on Nov 5, 1995.' },
+  { cat: 'history', lvl: 'pro', q: 'In just their second season (1996), the Panthers won which division?', a: ['NFC West', 'NFC South', 'NFC East', 'AFC South'], fact: 'Carolina went 12-4 and won the NFC West. The NFC South didn’t exist until 2002.' },
+  { cat: 'history', lvl: 'pro', q: 'Who did the Panthers beat for their first-ever playoff win (Jan 1997)?', a: ['Dallas Cowboys', 'Green Bay Packers', 'Philadelphia Eagles', 'Arizona Cardinals'], fact: 'Carolina beat the defending champion Cowboys 26-17 in Charlotte.' },
+  { cat: 'history', lvl: 'rookie', q: 'What nickname did the comeback-crazy 2003 Panthers earn?', a: ['The Cardiac Cats', 'The Comeback Kats', 'The Heart Attack Pack', 'The Late Show'], fact: 'The 2003 team won a string of close games on its way to Super Bowl XXXVIII.' },
+  { cat: 'history', lvl: 'rookie', q: 'Which team beat Carolina 32-29 in Super Bowl XXXVIII?', a: ['New England Patriots', 'Denver Broncos', 'Pittsburgh Steelers', 'Baltimore Ravens'], fact: 'Adam Vinatieri kicked the winning field goal in the final seconds in Houston on Feb 1, 2004.' },
+  { cat: 'history', lvl: 'pro', q: 'Steve Smith ended a double-overtime playoff game at St. Louis in Jan 2004 with a touchdown of how many yards?', a: ['69', '42', '81', '27'], fact: 'His 69-yard catch-and-run on the first play of the second overtime won it 29-23.' },
+  { cat: 'history', lvl: 'pro', q: 'Carolina won its first NFC Championship in Jan 2004 against which team?', a: ['Philadelphia Eagles', 'St. Louis Rams', 'Dallas Cowboys', 'Green Bay Packers'], fact: 'The Panthers won 14-3 in Philadelphia.' },
+  { cat: 'history', lvl: 'rookie', q: 'What was Carolina’s regular-season record in 2015?', a: ['15-1', '14-2', '13-3', '16-0'], fact: 'The Panthers started 14-0 before losing at Atlanta, then finished 15-1.' },
+  { cat: 'history', lvl: 'rookie', q: 'Who beat Carolina in Super Bowl 50?', a: ['Denver Broncos', 'New England Patriots', 'Seattle Seahawks', 'Kansas City Chiefs'], fact: 'Denver won 24-10 at Levi’s Stadium on Feb 7, 2016.' },
+  { cat: 'history', lvl: 'pro', q: 'What was the final score of the Panthers’ NFC Championship win over Arizona in Jan 2016?', a: ['49-15', '34-14', '31-24', '27-16'], fact: 'Carolina routed the Cardinals at home to reach Super Bowl 50.' },
+  { cat: 'history', lvl: 'legend', q: 'The Panthers played their first Thanksgiving game in 2015. Who did they beat?', a: ['Dallas Cowboys', 'Detroit Lions', 'Atlanta Falcons', 'New Orleans Saints'], fact: 'They won 33-14 at Dallas to move to 11-0.' },
+  { cat: 'history', lvl: 'pro', q: 'Who was the Panthers’ first head coach?', a: ['Dom Capers', 'George Seifert', 'John Fox', 'Ron Rivera'], fact: 'Dom Capers coached the team from 1995 through 1998.' },
+  { cat: 'history', lvl: 'rookie', q: 'Who is the Panthers’ head coach in 2026?', a: ['Dave Canales', 'Frank Reich', 'Matt Rhule', 'Ron Rivera'], fact: 'Carolina hired Canales, then Tampa Bay’s offensive coordinator, in January 2024.' },
+  { cat: 'history', lvl: 'pro', q: 'Who bought the Panthers in 2018?', a: ['David Tepper', 'Jerry Jones', 'Michael Jordan', 'Jerry Richardson'], fact: 'NFL owners approved Tepper’s purchase on May 22, 2018. Founder Jerry Richardson was the first owner.' },
+  { cat: 'history', lvl: 'pro', q: 'Carolina won the NFC South in 2025 with what record?', a: ['8-9', '10-7', '11-6', '9-8'], fact: 'They clinched when Atlanta beat New Orleans in Week 18, then lost a 34-31 Wild Card thriller to the Rams.' },
+  { cat: 'history', lvl: 'legend', q: 'How many division titles had the Panthers won through the 2025 season?', a: ['7', '5', '9', '4'], fact: 'NFC West 1996, then NFC South in 2003, 2008, 2013, 2014, 2015 and 2025.' },
+  { cat: 'history', lvl: 'legend', q: 'Where did Carolina play its first regular-season game outside the U.S. (2019)?', a: ['London', 'Mexico City', 'Munich', 'Toronto'], fact: 'The Panthers beat Tampa Bay in London on Oct 13, 2019.' },
+  { cat: 'history', lvl: 'legend', q: 'Who did the Panthers trade to Chicago in the 2023 deal for the No. 1 overall pick?', a: ['DJ Moore', 'Brian Burns', 'Christian McCaffrey', 'Robbie Anderson'], fact: 'Moore plus draft picks went to the Bears; Carolina used the pick on Bryce Young.' },
 
-    function showQuestion() {
-      clearInterval(timer);
-      timeLeft = TIME_LIMIT;
-      updateTimerBar();
+  // ---- Legends
+  { cat: 'legends', lvl: 'rookie', q: 'Whose speech gave the team its motto, “Keep Pounding”?', a: ['Sam Mills', 'Luke Kuechly', 'Thomas Davis', 'Jake Delhomme'], fact: 'Battling cancer, assistant coach Sam Mills gave the speech on Jan 2, 2004, before a playoff game against Dallas.' },
+  { cat: 'legends', lvl: 'rookie', q: 'What is the only number the Panthers have retired?', a: ['51', '89', '1', '59'], fact: '#51 belonged to linebacker Sam Mills, a 2022 Pro Football Hall of Fame inductee.' },
+  { cat: 'legends', lvl: 'pro', q: 'Who is the Panthers’ all-time leader in passing yards?', a: ['Cam Newton', 'Jake Delhomme', 'Steve Beuerlein', 'Bryce Young'], fact: 'Newton threw for 29,725 yards as a Panther.' },
+  { cat: 'legends', lvl: 'pro', q: 'Who is the Panthers’ all-time leading rusher?', a: ['Jonathan Stewart', 'DeAngelo Williams', 'Christian McCaffrey', 'Stephen Davis'], fact: 'Stewart ran for 7,318 yards in Carolina.' },
+  { cat: 'legends', lvl: 'rookie', q: 'Who holds the Panthers record for career receiving yards?', a: ['Steve Smith Sr.', 'Muhsin Muhammad', 'Greg Olsen', 'DJ Moore'], fact: 'Smith piled up 12,197 receiving yards in 13 seasons with Carolina.' },
+  { cat: 'legends', lvl: 'pro', q: 'Who is the Panthers’ all-time sack leader?', a: ['Julius Peppers', 'Charles Johnson', 'Brian Burns', 'Mike Rucker'], fact: 'Peppers had 97 sacks as a Panther and entered the Pro Football Hall of Fame in 2024.' },
+  { cat: 'legends', lvl: 'legend', q: 'Who holds the Panthers record for career interceptions?', a: ['Chris Gamble', 'Josh Norman', 'Luke Kuechly', 'Ken Lucas'], fact: 'Gamble picked off 27 passes for Carolina.' },
+  { cat: 'legends', lvl: 'rookie', q: 'Who was named NFL MVP after the 2015 season?', a: ['Cam Newton', 'Luke Kuechly', 'Josh Norman', 'Greg Olsen'], fact: 'Newton won MVP, and Ron Rivera was Coach of the Year.' },
+  { cat: 'legends', lvl: 'pro', q: 'Luke Kuechly was enshrined in the Pro Football Hall of Fame in which year?', a: ['2026', '2024', '2025', '2022'], fact: 'He was elected in February 2026 and enshrined in Canton on Aug 8, 2026.' },
+  { cat: 'legends', lvl: 'legend', q: 'In 2005, Steve Smith Sr. led or tied for the NFL lead in catches, yards and TDs. How many receiving yards did he have?', a: ['1,563', '1,421', '1,712', '1,398'], fact: 'Smith had 103 catches, 1,563 yards and 12 TDs, often called the receiving “triple crown.”' },
+  { cat: 'legends', lvl: 'pro', q: 'Which pick did Carolina use to draft Julius Peppers in 2002?', a: ['No. 2 overall', 'No. 1 overall', 'No. 5 overall', 'No. 9 overall'], fact: 'Peppers came out of North Carolina as the second overall pick.' },
+  { cat: 'legends', lvl: 'pro', q: 'Cam Newton was drafted No. 1 overall in which year?', a: ['2011', '2010', '2012', '2009'], fact: 'Carolina picked the Heisman winner out of Auburn on April 28, 2011.' },
+  { cat: 'legends', lvl: 'legend', q: 'Cam Newton’s first NFL start set a rookie debut record with how many passing yards?', a: ['422', '354', '389', '305'], fact: 'He threw for 422 yards at Arizona on Sept 11, 2011.' },
+  { cat: 'legends', lvl: 'legend', q: 'Which pick did Carolina use on Luke Kuechly in 2012?', a: ['No. 9 overall', 'No. 1 overall', 'No. 15 overall', 'No. 4 overall'], fact: 'The Boston College linebacker went ninth and became a seven-time Pro Bowler.' },
+  { cat: 'legends', lvl: 'pro', q: 'Who was the first person inducted into the Panthers Hall of Honor (1997)?', a: ['Mike McCormack', 'Sam Mills', 'Jerry Richardson', 'Steve Smith Sr.'], fact: 'McCormack was the team’s founding president and general manager.' },
+  { cat: 'legends', lvl: 'pro', q: 'Who was the Panthers’ quarterback on the 2003 Super Bowl team?', a: ['Jake Delhomme', 'Rodney Peete', 'Chris Weinke', 'Steve Beuerlein'], fact: 'Delhomme replaced Rodney Peete in the 2003 opener and led a 24-23 comeback.' },
+  { cat: 'legends', lvl: 'legend', q: 'In 2019, Christian McCaffrey became the third player ever with 1,000 rushing and 1,000 receiving yards in a season. True or false?', a: ['True', 'False'], fact: 'McCaffrey joined Roger Craig and Marshall Faulk in the 1,000/1,000 club.' },
+  { cat: 'legends', lvl: 'legend', q: 'DeAngelo Williams set the franchise record for rushing TDs in a game in 2008. How many did he score?', a: ['4', '3', '5', '6'], fact: 'Williams ran for four touchdowns in a 35-31 win at Green Bay.' },
 
-      const q = quizData[currentQuestionIndex];
-      document.getElementById("question").textContent = `Q${currentQuestionIndex + 1}: ${q.question}`;
-      document.getElementById("feedback").textContent = "";
+  // ---- 2026 squad
+  { cat: 'squad', lvl: 'rookie', q: 'Who is Carolina’s starting quarterback in 2026?', a: ['Bryce Young', 'Kenny Pickett', 'Baker Mayfield', 'Andy Dalton'], fact: 'Young was the No. 1 overall pick in 2023 out of Alabama.' },
+  { cat: 'squad', lvl: 'rookie', q: 'What number does Bryce Young wear?', a: ['9', '1', '3', '12'], fact: 'Young wears #9.' },
+  { cat: 'squad', lvl: 'pro', q: 'Where did Bryce Young play college football?', a: ['Alabama', 'USC', 'Georgia', 'Ohio State'], fact: 'He won the Heisman Trophy at Alabama in 2021.' },
+  { cat: 'squad', lvl: 'pro', q: 'Which pick did Carolina use on WR Tetairoa McMillan in 2025?', a: ['No. 8 overall', 'No. 1 overall', 'No. 19 overall', 'No. 32 overall'], fact: 'McMillan came out of Arizona as the eighth pick.' },
+  { cat: 'squad', lvl: 'legend', q: 'Against Detroit in Week 4 of 2026, Tetairoa McMillan set career highs with 14 catches for how many yards?', a: ['192', '148', '211', '167'], fact: 'That was one catch and 9 yards short of the franchise single-game records.' },
+  { cat: 'squad', lvl: 'pro', q: 'Who is the Panthers’ starting running back in 2026?', a: ['Chuba Hubbard', 'Trevor Etienne', 'AJ Dillon', 'Miles Sanders'], fact: 'Hubbard had 426 rushing yards and 6 total TDs through five games.' },
+  { cat: 'squad', lvl: 'pro', q: 'Which linebacker returned an interception for a touchdown against Atlanta in Week 2 of 2026?', a: ['Devin Lloyd', 'Bobby Okereke', 'Trevis Gipson', 'Jaelan Phillips'], fact: 'Lloyd had two interceptions that day, one a 16-yard pick-six, in a 34-3 win.' },
+  { cat: 'squad', lvl: 'legend', q: 'Chicago scored how many points against Carolina in the 2026 season opener, the most the Panthers have ever allowed?', a: ['59', '52', '48', '63'], fact: 'Chicago won 59-37, the highest-scoring season opener in NFL history.' },
+  { cat: 'squad', lvl: 'pro', q: 'Who is the Panthers’ kicker in 2026?', a: ['Ryan Fitzgerald', 'Eddy Piñeiro', 'Graham Gano', 'Joey Slye'], fact: 'Fitzgerald was a perfect 11-for-11 on field goals through Week 6.' },
+  { cat: 'squad', lvl: 'pro', q: 'Defensive tackle Derrick Brown played college football where?', a: ['Auburn', 'Clemson', 'LSU', 'Alabama'], fact: 'Brown wears #95 and anchors the middle of the defensive line.' },
+  { cat: 'squad', lvl: 'legend', q: 'Who starts at center for Carolina on the 2026 depth chart?', a: ['Luke Fortner', 'Sam Hecht', 'Austin Corbett', 'Bradley Bozeman'], fact: 'Fortner is listed first at center, with Sam Hecht behind him.' },
+  { cat: 'squad', lvl: 'pro', q: 'Who handles both punting and holding for kicks in 2026?', a: ['Sam Martin', 'Johnny Hekker', 'JJ Jansen', 'Ryan Fitzgerald'], fact: 'Martin was averaging 46.6 yards per punt through Week 6.' },
+  { cat: 'squad', lvl: 'pro', q: 'Chuba Hubbard played college football at…', a: ['Oklahoma State', 'Oklahoma', 'Texas', 'Iowa State'], fact: 'Hubbard led the nation in rushing at Oklahoma State in 2019.' },
 
-      const optionsContainer = document.getElementById("options");
-      optionsContainer.innerHTML = "";
+  // ---- Stadium & game day
+  { cat: 'stadium', lvl: 'rookie', q: 'What is the Panthers’ home stadium called?', a: ['Bank of America Stadium', 'Ericsson Stadium', 'Spectrum Stadium', 'Truist Field'], fact: 'It opened in 1996 as Ericsson Stadium and was renamed in 2004.' },
+  { cat: 'stadium', lvl: 'pro', q: 'What was Bank of America Stadium originally called?', a: ['Ericsson Stadium', 'Carolinas Stadium', 'Charlotte Coliseum', 'Panthers Park'], fact: 'It was Ericsson Stadium from 1996 until 2004.' },
+  { cat: 'stadium', lvl: 'pro', q: 'What is the listed seating capacity of Bank of America Stadium?', a: ['75,037', '68,500', '82,193', '71,250'], fact: '82,193 is the all-time attendance record, set at a 2024 concert.' },
+  { cat: 'stadium', lvl: 'rookie', q: 'What is the name of the Panthers’ mascot?', a: ['Sir Purr', 'Roary', 'Prowler', 'Captain Claw'], fact: 'Sir Purr works the crowd at every home game, alongside the TopCats and the PurrCussion drumline.' },
+  { cat: 'stadium', lvl: 'pro', q: 'What is the Panthers’ cheerleading squad called?', a: ['TopCats', 'Panthers Pride', 'Kitty Kats', 'Blue Crew'], fact: 'The TopCats perform at every home game.' },
+  { cat: 'stadium', lvl: 'legend', q: 'How many bronze “Indomitable Spirit” panther statues guard the stadium gates?', a: ['6', '4', '2', '8'], fact: 'Two stand at each of the three public gates.' },
+  { cat: 'stadium', lvl: 'pro', q: 'What’s the biggest clear bag allowed into the stadium?', a: ['12" × 6" × 12"', '14" × 14" × 6"', '10" × 10" × 10"', '18" × 12" × 6"'], fact: 'Small clutches up to 4.5" × 6.5" are also allowed.' },
+  { cat: 'stadium', lvl: 'pro', q: 'How early do the stadium gates open before kickoff?', a: ['2 hours', '1 hour', '90 minutes', '3 hours'], fact: 'The free Panthers Play Yard opens at the same time.' },
+  { cat: 'stadium', lvl: 'legend', q: 'When do alcohol sales end at Panthers home games?', a: ['End of the 3rd quarter', 'Halftime', 'Two-minute warning', 'End of the 1st half'], fact: 'Sales stop at the close of the third quarter. The stadium is also smoke- and vape-free.' },
+  { cat: 'stadium', lvl: 'pro', q: 'How much is the planned stadium renovation expected to cost?', a: ['$1.3 billion', '$800 million', '$650 million', '$2 billion'], fact: 'The plan grew to $1.3 billion in July 2026, with work targeted to finish in 2030.' },
+  { cat: 'stadium', lvl: 'legend', q: 'Which light rail line stops a few blocks from the stadium?', a: ['LYNX Blue Line', 'LYNX Gold Line', 'MARTA Red Line', 'CATS Silver Line'], fact: 'Carson, Stonewall and Convention Center stations are all within a short walk.' },
+  { cat: 'stadium', lvl: 'pro', q: 'On which street is Bank of America Stadium’s address?', a: ['Mint Street', 'Tryon Street', 'Trade Street', 'Morehead Street'], fact: 'The address is 800 S. Mint St. in Uptown Charlotte.' },
+  { cat: 'stadium', lvl: 'legend', q: 'What’s the stadium record for a football crowd?', a: ['74,532', '75,412', '73,778', '76,105'], fact: 'It was set Sept 9, 2018, when Carolina beat Dallas 16-8.' }
+];
 
-      q.options.forEach((opt, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "btn-option";
-        btn.textContent = opt;
-        btn.onclick = () => checkAnswer(idx);
-        optionsContainer.appendChild(btn);
-      });
+const CATS = { all: '🔎 All', history: '📜 History', legends: '⭐ Legends', squad: '🐾 2026 Squad', stadium: '🏟️ Stadium' };
+const LEVELS = { mixed: 'Mixed', rookie: '🟢 Rookie', pro: '🔵 Pro', legend: '🟡 Legend' };
+const LEVEL_NAMES = { rookie: 'Rookie', pro: 'Pro', legend: 'Legend' };
+const MODES = {
+  classic: { name: 'Classic', icon: '🏈', desc: '10 questions, 15 seconds each. Lifelines included.', count: 10, time: 15 },
+  blitz: { name: 'Blitz', icon: '⚡', desc: '60 seconds on the clock. Answer as many as you can; misses cost 3 seconds.', time: 60 },
+  sudden: { name: 'Sudden Death', icon: '💀', desc: 'Gets harder as you go. One wrong answer ends it.', time: 15 },
+  daily: { name: 'Daily Challenge', icon: '📅', desc: 'Same 5 questions for every fan today. One shot. No lifelines.', count: 5, time: 20 }
+};
+const RANKS = [[100, 'Hall of Famer'], [90, 'Pro Bowler'], [75, 'Team Captain'], [55, 'Starter'], [35, 'Rotational Player'], [0, 'Practice Squad']];
 
-      timer = setInterval(() => {
-        timeLeft--;
-        updateTimerBar();
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          handleTimeout();
-        }
-      }, 1000);
-    }
+// ===================================================================================================
+// Helpers
+// ===================================================================================================
+const $ = id => document.getElementById(id);
+function saved(key, fallback) { try { const v = localStorage.getItem('pt:' + key); return v == null ? fallback : JSON.parse(v); } catch { return fallback; } }
+function save(key, value) { try { localStorage.setItem('pt:' + key, JSON.stringify(value)); } catch { /* storage unavailable */ } }
 
-    function updateTimerBar() {
-      const percentage = (timeLeft / TIME_LIMIT) * 100;
-      document.getElementById("timer-bar").style.width = `${percentage}%`;
-    }
+// Small seeded random generator so the Daily Challenge is the same for everyone
+function seededRandom(seed) {
+  let a = 0;
+  for (const ch of String(seed)) a = (Math.imul(a ^ ch.charCodeAt(0), 2654435761) >>> 0);
+  return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function shuffle(list, rand = Math.random) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function todayKey(now = Date.now()) {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(now));
+}
+function rankFor(pct) { return RANKS.find(([min]) => pct >= min)[1]; }
 
-    function handleTimeout() {
-      const feedbackEl = document.getElementById("feedback");
-      feedbackEl.style.color = "#f87171";
-      feedbackEl.textContent = "Time's up!";
+// Points for a correct answer: 100 base + up to 50 for speed, times a streak bonus (up to +50%)
+function pointsFor(secondsLeft, limit, streak) {
+  const speed = limit ? Math.round(50 * Math.max(0, secondsLeft) / limit) : 0;
+  const mult = 1 + 0.1 * Math.min(streak, 5);
+  return Math.round((100 + speed) * mult);
+}
 
-      disableButtons();
-      nextQuestionDelay();
-    }
+// Build the list of questions for a game
+function buildDeck(mode, cat, lvl, now = Date.now()) {
+  const byCat = QUESTIONS.filter(q => cat === 'all' || q.cat === cat);
+  if (mode === 'daily') {
+    const rand = seededRandom('daily-' + todayKey(now));
+    const pick = lv => shuffle(QUESTIONS.filter(q => q.lvl === lv), rand);
+    const r = pick('rookie'), p = pick('pro'), l = pick('legend');
+    return [r[0], r[1], p[0], p[1], l[0]];
+  }
+  if (mode === 'sudden') {
+    const order = ['rookie', 'pro', 'legend'];
+    return order.flatMap(lv => shuffle(byCat.filter(q => q.lvl === lv)));
+  }
+  if (mode === 'blitz') return shuffle(byCat);
+  const pool = byCat.filter(q => lvl === 'mixed' || q.lvl === lvl);
+  return shuffle(pool.length >= 4 ? pool : byCat).slice(0, MODES.classic.count);
+}
 
-    function checkAnswer(selectedIdx) {
-      clearInterval(timer);
-      const correctIdx = quizData[currentQuestionIndex].answer;
-      const feedbackEl = document.getElementById("feedback");
+// ===================================================================================================
+// Game state
+// ===================================================================================================
+const prefs = { cat: saved('cat', 'all'), lvl: saved('lvl', 'mixed') };
+let game = null;
+let tick = null;
 
-      if (selectedIdx === correctIdx) {
-        score++;
-        document.getElementById("score").textContent = score;
-        feedbackEl.style.color = "#4ade80";
-        feedbackEl.textContent = "Correct! Keep Pounding!";
-      } else {
-        feedbackEl.style.color = "#f87171";
-        feedbackEl.textContent = `Incorrect! Answer: ${quizData[currentQuestionIndex].options[correctIdx]}`;
-      }
+function showScreen(name) {
+  ['start', 'game', 'results'].forEach(s => $('screen-' + s).classList.toggle('hidden', s !== name));
+  window.scrollTo?.(0, 0);
+}
 
-      disableButtons();
-      nextQuestionDelay();
-    }
+function renderStart() {
+  $('bank-size').textContent = `${QUESTIONS.length} questions`;
+  const daily = saved('daily-' + todayKey(), null);
+  $('modes').innerHTML = Object.entries(MODES).map(([id, m]) => {
+    const best = saved('best-' + id, null);
+    let bestText = best != null ? `★ Best: ${best.toLocaleString()} pts` : 'No score yet';
+    if (id === 'daily' && daily) bestText = `✔ Done today: ${daily.correct}/5 · ${daily.score} pts. Come back tomorrow.`;
+    return `<button class="mode ${id === 'daily' && daily ? 'done' : ''}" onclick="startGame('${id}')" aria-label="Play ${m.name}">
+      <div class="icon">${m.icon}</div><div class="name">${m.name}</div><div class="desc">${m.desc}</div><div class="best">${bestText}</div></button>`;
+  }).join('');
+  $('cat-chips').innerHTML = Object.entries(CATS).map(([k, v]) =>
+    `<button class="chip" aria-pressed="${prefs.cat === k}" onclick="setPref('cat','${k}')">${v}</button>`).join('');
+  $('lvl-chips').innerHTML = Object.entries(LEVELS).map(([k, v]) =>
+    `<button class="chip" aria-pressed="${prefs.lvl === k}" onclick="setPref('lvl','${k}')">${v}</button>`).join('');
+}
+function setPref(key, value) { prefs[key] = value; save(key, value); renderStart(); }
+function showStart() { clearInterval(tick); game = null; renderStart(); showScreen('start'); }
 
-    function disableButtons() {
-      const buttons = document.querySelectorAll(".btn-option");
-      buttons.forEach(btn => btn.disabled = true);
-    }
+function startGame(mode) {
+  if (mode === 'daily' && saved('daily-' + todayKey(), null)) {
+    showDailyResult();
+    return;
+  }
+  const m = MODES[mode];
+  game = {
+    mode, deck: buildDeck(mode, prefs.cat, prefs.lvl), i: -1, score: 0, streak: 0, bestStreak: 0, correct: 0, answered: 0,
+    log: [], lifelines: { fifty: mode !== 'daily', skip: mode !== 'daily' }, clock: m.time, locked: false, startedAt: Date.now()
+  };
+  $('mode-label').textContent = `${m.icon} ${m.name}${mode === 'classic' || mode === 'blitz' ? ` · ${CATS[prefs.cat].replace(/^\S+ /, '')}` : ''}${mode === 'classic' && prefs.lvl !== 'mixed' ? ` · ${LEVEL_NAMES[prefs.lvl]}` : ''}`;
+  $('lifelines').classList.toggle('hidden', mode === 'daily');
+  $('hud-left-label').textContent = mode === 'blitz' ? 'Time' : mode === 'sudden' ? 'Survived' : 'Question';
+  showScreen('game');
+  if (mode === 'blitz') {
+    clearInterval(tick);
+    tick = setInterval(() => { game.clock -= 0.25; updateHud(); if (game.clock <= 0) endGame(); }, 250);
+  }
+  nextQuestion();
+}
 
-    function nextQuestionDelay() {
-      setTimeout(() => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizData.length) {
-          showQuestion();
-        } else {
-          endQuiz();
-        }
-      }, 1500);
-    }
+function currentQ() { return game.deck[game.i]; }
 
-    function endQuiz() {
-      clearInterval(timer);
-      document.getElementById("question").textContent = "Game Over!";
-      document.getElementById("options").innerHTML = "";
-      document.getElementById("timer-bar").style.width = "0%";
-      
-      const percentageScore = Math.round((score / quizData.length) * 100);
-      document.getElementById("feedback").style.color = "#ffffff";
-      document.getElementById("feedback").textContent = `Final Score: ${score} / ${quizData.length} (${percentageScore}%)`;
-      document.getElementById("restart-btn").style.display = "inline-block";
-    }
+function nextQuestion() {
+  if (!game) return;
+  game.i++;
+  if (game.i >= game.deck.length) { endGame(); return; }
+  const q = currentQ();
+  game.locked = false;
+  game.options = shuffle(q.a);
+  game.qStart = Date.now();
+  $('q-cat').textContent = CATS[q.cat];
+  $('q-lvl').textContent = LEVEL_NAMES[q.lvl];
+  $('q-lvl').className = `tag lvl-${q.lvl}`;
+  $('question').textContent = q.q;
+  $('opts').innerHTML = game.options.map((opt, idx) =>
+    `<button class="opt" data-idx="${idx}" onclick="answer(${idx})"><span class="key">${idx + 1}</span><span></span></button>`).join('');
+  $('opts').querySelectorAll('.opt span:last-child').forEach((el, idx) => { el.textContent = game.options[idx]; });
+  $('feedback').classList.add('hidden');
+  $('next-btn').classList.add('hidden');
+  $('ll-5050').disabled = !game.lifelines.fifty || q.a.length < 4;
+  $('ll-skip').disabled = !game.lifelines.skip;
+  if (game.mode !== 'blitz') {
+    game.clock = MODES[game.mode].time;
+    clearInterval(tick);
+    tick = setInterval(() => { game.clock -= 0.25; updateHud(); if (game.clock <= 0) timeUp(); }, 250);
+  }
+  updateHud();
+}
 
-    startQuiz();
-  </script>
+function updateHud() {
+  if (!game) return;
+  const m = MODES[game.mode];
+  if (game.mode === 'blitz') $('hud-left').textContent = `${Math.max(0, Math.ceil(game.clock))}s`;
+  else if (game.mode === 'sudden') $('hud-left').textContent = game.correct;
+  else $('hud-left').textContent = `${Math.min(game.i + 1, game.deck.length)}/${game.deck.length}`;
+  $('hud-score').textContent = game.score.toLocaleString();
+  $('hud-streak').textContent = game.streak >= 2 ? `🔥${game.streak}` : game.streak;
+  const pct = Math.max(0, game.clock / m.time) * 100;
+  $('bar-fill').style.width = pct + '%';
+  $('bar').classList.toggle('low', pct < 30);
+}
 
+function lockOptions(correctIdx, chosenIdx) {
+  game.locked = true;
+  if (game.mode !== 'blitz') clearInterval(tick);
+  $('opts').querySelectorAll('.opt').forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === correctIdx) b.classList.add('right');
+    if (idx === chosenIdx && idx !== correctIdx) b.classList.add('wrong');
+  });
+}
+
+function answer(idx) {
+  if (!game || game.locked) return;
+  const q = currentQ();
+  const correctIdx = game.options.indexOf(q.a[0]);
+  const right = idx === correctIdx;
+  lockOptions(correctIdx, idx);
+  game.answered++;
+  let gained = 0;
+  if (right) {
+    game.correct++;
+    game.streak++;
+    game.bestStreak = Math.max(game.bestStreak, game.streak);
+    gained = game.mode === 'blitz' ? pointsFor(0, 0, game.streak - 1) : pointsFor(game.clock, MODES[game.mode].time, game.streak - 1);
+    game.score += gained;
+    $('hud-streak').classList.remove('pop'); void $('hud-streak').offsetWidth; $('hud-streak').classList.add('pop');
+  } else {
+    game.streak = 0;
+    if (game.mode === 'blitz') game.clock = Math.max(0, game.clock - 3);
+  }
+  game.log.push({ q, chosen: game.options[idx], right, skipped: false });
+  updateHud();
+  afterAnswer(right, gained, q);
+}
+
+function timeUp() {
+  if (!game || game.locked) return;
+  const q = currentQ();
+  lockOptions(game.options.indexOf(q.a[0]), -1);
+  game.answered++;
+  game.streak = 0;
+  game.log.push({ q, chosen: null, right: false, skipped: false });
+  updateHud();
+  afterAnswer(false, 0, q, true);
+}
+
+function afterAnswer(right, gained, q, timedOut = false) {
+  if (game.mode === 'blitz') {
+    setTimeout(() => { if (game && game.clock > 0) nextQuestion(); }, right ? 450 : 900);
+    return;
+  }
+  const fb = $('feedback');
+  fb.className = `feedback ${right ? 'good' : 'bad'}`;
+  fb.innerHTML = `<strong>${right ? `✅ Correct! +${gained}` : timedOut ? '⏱ Time’s up!' : '❌ Not quite.'}</strong><br><span class="ans"></span><span class="fact"></span>`;
+  fb.querySelector('.ans').textContent = right ? '' : `Answer: ${q.a[0]}. `;
+  fb.querySelector('.fact').textContent = q.fact;
+  const over = game.mode === 'sudden' && !right;
+  $('next-btn').textContent = over || game.i === game.deck.length - 1 ? 'See results ▶' : 'Next ▶';
+  $('next-btn').classList.remove('hidden');
+  $('next-btn').focus?.();
+  if (over) game.deck = game.deck.slice(0, game.i + 1);
+}
+
+function useFifty() {
+  if (!game || game.locked || !game.lifelines.fifty) return;
+  const q = currentQ();
+  if (q.a.length < 4) return;
+  game.lifelines.fifty = false;
+  $('ll-5050').disabled = true;
+  const wrongIdx = game.options.map((o, i) => (o === q.a[0] ? -1 : i)).filter(i => i >= 0);
+  shuffle(wrongIdx).slice(0, 2).forEach(i => {
+    const b = $('opts').querySelector(`[data-idx="${i}"]`);
+    b.disabled = true;
+    b.classList.add('gone');
+  });
+}
+
+function useSkip() {
+  if (!game || game.locked || !game.lifelines.skip) return;
+  game.lifelines.skip = false;
+  game.log.push({ q: currentQ(), chosen: null, right: false, skipped: true });
+  if (game.mode === 'classic') game.deck.push(...QUESTIONS.filter(q => !game.deck.includes(q) && (prefs.cat === 'all' || q.cat === prefs.cat)).slice(0, 1));
+  nextQuestion();
+}
+
+function endGame() {
+  if (!game) return;
+  clearInterval(tick);
+  const g = game;
+  const asked = g.log.filter(l => !l.skipped).length;
+  const pct = asked ? Math.round(100 * g.correct / asked) : 0;
+  const bestKey = 'best-' + g.mode;
+  const prevBest = saved(bestKey, null);
+  const isBest = g.score > 0 && (prevBest == null || g.score > prevBest);
+  if (isBest) save(bestKey, g.score);
+  const grid = g.log.filter(l => !l.skipped).map(l => (l.right ? '🟦' : '⬛')).join('');
+  if (g.mode === 'daily') save('daily-' + todayKey(), { score: g.score, correct: g.correct, grid });
+  g.result = { pct, isBest, grid, asked };
+
+  $('res-mode').textContent = `${MODES[g.mode].icon} ${MODES[g.mode].name}${g.mode === 'daily' ? ' · ' + todayKey() : ''}`;
+  $('res-score').textContent = g.score.toLocaleString();
+  $('res-rank').textContent = rankFor(pct);
+  $('res-best').classList.toggle('hidden', !isBest);
+  $('res-correct').textContent = g.mode === 'sudden' ? g.correct : `${g.correct}/${asked}`;
+  $('res-acc').textContent = pct + '%';
+  $('res-streak').textContent = g.bestStreak;
+  $('res-grid').textContent = grid;
+  const missed = g.log.filter(l => !l.right);
+  $('review-wrap').classList.toggle('hidden', !missed.length);
+  $('review').innerHTML = '';
+  missed.forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = '<div class="q" style="font-weight:700"></div><div><span class="mine"></span> <span class="ans"></span></div><div class="muted fact" style="margin-top:4px"></div>';
+    div.querySelector('.q').textContent = l.q.q;
+    div.querySelector('.mine').textContent = l.skipped ? 'Skipped.' : l.chosen ? `You said: ${l.chosen}.` : 'Ran out of time.';
+    div.querySelector('.ans').textContent = `Answer: ${l.q.a[0]}`;
+    div.querySelector('.fact').textContent = l.q.fact;
+    $('review').appendChild(div);
+  });
+  showScreen('results');
+  if (isBest || pct === 100) confetti();
+}
+
+function showDailyResult() {
+  const d = saved('daily-' + todayKey(), null);
+  game = { mode: 'daily', score: d.score, correct: d.correct, bestStreak: 0, log: [], result: { pct: Math.round(100 * d.correct / 5), grid: d.grid, asked: 5 } };
+  $('res-mode').textContent = `📅 Daily Challenge · ${todayKey()} (already played)`;
+  $('res-score').textContent = d.score.toLocaleString();
+  $('res-rank').textContent = rankFor(game.result.pct);
+  $('res-best').classList.add('hidden');
+  $('res-correct').textContent = `${d.correct}/5`;
+  $('res-acc').textContent = game.result.pct + '%';
+  $('res-streak').textContent = '—';
+  $('res-grid').textContent = d.grid;
+  $('review-wrap').classList.add('hidden');
+  showScreen('results');
+}
+
+function playAgain() {
+  const mode = game ? game.mode : 'classic';
+  if (mode === 'daily') { showStart(); return; }
+  startGame(mode);
+}
+
+function quitGame() { if (confirm('Quit this game? Your score won’t be saved.')) showStart(); }
+
+function shareText() {
+  const g = game;
+  const m = MODES[g.mode];
+  const head = g.mode === 'daily' ? `🐾 Panthers Trivia Daily ${todayKey()}` : `🐾 Panthers Trivia: ${m.name}`;
+  return `${head}\n${g.result.grid}\n${g.correct}${g.mode === 'sudden' ? ' in a row' : '/' + g.result.asked} · ${g.score.toLocaleString()} pts · ${rankFor(g.result.pct)}\nKeep Pounding! ${location.href.split('#')[0]}`;
+}
+
+function shareResult() {
+  const text = shareText();
+  const done = () => { $('share-btn').textContent = '✔ Copied'; setTimeout(() => { $('share-btn').textContent = '📋 Share'; }, 1800); };
+  if (navigator.share) { navigator.share({ text }).catch(() => {}); return; }
+  (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(done, () => prompt('Copy your result:', text));
+}
+
+function confetti() {
+  const colors = ['#0085CA', '#ffffff', '#A5ACAF', '#101820', '#36b3f2'];
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = 1.8 + Math.random() * 1.6 + 's';
+    c.style.animationDelay = Math.random() * 0.4 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4200);
+  }
+}
+
+// Keyboard: 1-4 to answer, Enter for next
+document.addEventListener('keydown', e => {
+  if (!game || $('screen-game').classList.contains('hidden')) return;
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= 4 && !game.locked) {
+    const b = $('opts').querySelector(`[data-idx="${n - 1}"]`);
+    if (b && !b.disabled) answer(n - 1);
+  } else if (e.key === 'Enter' && game.locked && !$('next-btn').classList.contains('hidden')) {
+    e.preventDefault();
+    nextQuestion();
+  }
+});
+
+renderStart();
+</script>
 </body>
 </html>
