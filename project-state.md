@@ -5,7 +5,7 @@
 - **Status:** Live on Vercel (https://my-first-game-opal.vercel.app)
 
 ## What's in it
-- 67 fact-checked questions in 4 categories (History, Legends, 2026 Squad, Stadium) and 3 difficulty levels.
+- 69 fact-checked questions in 4 categories (History, Legends, 2026 Squad, Stadium) and 3 difficulty levels.
 - Modes: Classic (10 questions, 15 s each), Blitz (60 s, misses cost 3 s), Sudden Death (gets harder, one miss ends it), Daily Challenge (same 5 questions for everyone each day, one attempt).
 - Scoring: 100 per correct answer + up to 50 speed bonus, multiplied by a streak bonus (up to +50%).
 - Lifelines: 50/50 and Skip, once per game (not in the Daily Challenge).
